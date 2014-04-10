@@ -1,10 +1,17 @@
+package pkg;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Familia extends Thread {
-
+public class Familia extends Thread implements Serializable {
+	
+	private static final long	serialVersionUID	= -5070026948247923813L;
+	
+	
 	private Cidade cidade;
-	private List<Pessoa> integrantes;
-
+	private final List<Pessoa>	integrantes			= new ArrayList<>();
+	
 	public void calcularConsumo¡gua() throws InterruptedException {
 		int consumoAgua = 0;
 		while (true) {
@@ -32,6 +39,11 @@ public class Familia extends Thread {
 		}
 	}
 	
+	public int getPeopleCount() {
+		return integrantes.size();
+	}
 	
-
+	public void addPessoa(final Pessoa pessoa) {
+		integrantes.add(pessoa);
+	}
 }
