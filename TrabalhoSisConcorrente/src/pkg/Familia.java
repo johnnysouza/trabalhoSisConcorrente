@@ -4,23 +4,13 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-<<<<<<< HEAD
 public class Familia implements Serializable {
 	
-
-	private static final long	serialVersionUID	= -5070026948247923813L;
-=======
-public class Familia extends Thread implements Serializable {
-
 	private static final long serialVersionUID = -5070026948247923813L;
 
->>>>>>> branch 'master' of https://github.com/johnnysouza/trabalhoSisConcorrente.git
 	private Cidade cidade;
 	private final List<Pessoa> integrantes = new ArrayList<>();
-<<<<<<< HEAD
 	
-=======
-
 	public void calcularConsumoÁgua() throws InterruptedException {
 		int consumoAgua = 0;
 		while (true) {
@@ -48,7 +38,6 @@ public class Familia extends Thread implements Serializable {
 		}
 	}
 
->>>>>>> branch 'master' of https://github.com/johnnysouza/trabalhoSisConcorrente.git
 	public int getPeopleCount() {
 		return integrantes.size();
 	}
@@ -73,7 +62,6 @@ public class Familia extends Thread implements Serializable {
 		double mediaPeso = totalPeso / tamFamilia;
 		integrantes.add(new Pessoa(Escolaridade.values()[mediaEscolaridade], mediaRenda, mediaPeso));
 	}
-<<<<<<< HEAD
 	
 	public Cidade getCidade() {
 		return cidade;
@@ -86,6 +74,4 @@ public class Familia extends Thread implements Serializable {
 	public List<Pessoa> getIntegrantes() {
 		return integrantes;
 	}
-=======
->>>>>>> branch 'master' of https://github.com/johnnysouza/trabalhoSisConcorrente.git
 }
