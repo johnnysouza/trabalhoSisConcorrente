@@ -9,6 +9,16 @@ public class Pessoa implements Serializable {
 	private double				renda;
 	private double				peso;
 	
+	public Pessoa() {
+	}
+	
+	public Pessoa(Escolaridade escolaridade, double renda, double peso) {
+		super();
+		this.escolaridade = escolaridade;
+		this.renda = renda;
+		this.peso = peso;
+	}
+
 	/**
 	 * @return the escolaridade
 	 */
