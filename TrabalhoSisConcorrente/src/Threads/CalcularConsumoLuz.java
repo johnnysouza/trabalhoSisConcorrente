@@ -9,6 +9,7 @@ public class CalcularConsumoLuz extends Thread {
 	private static double LIGHTMAGICNUMBER = 0.04;
 	
 	public CalcularConsumoLuz(Familia familia) {
+		super("Consumo Luz " + Thread.currentThread().getId());
 		this.familia = familia;
 	}
 	
@@ -21,12 +22,15 @@ public class CalcularConsumoLuz extends Thread {
 			}
 			try {
 				familia.getCidade().addConsumoLuz(consumoLuz);
-				wait();
+				aguardar();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 	}
 	
+	private synchronized void aguardar() throws InterruptedException {
+		wait();
+	}
 }
 

@@ -6,7 +6,6 @@ import java.util.List;
 
 public class Familia implements Serializable {
 	
-
 	private static final long	serialVersionUID	= -5070026948247923813L;
 	private Cidade cidade;
 	private final List<Pessoa> integrantes = new ArrayList<>();

@@ -9,6 +9,7 @@ public class CalcularConsumoAlimentacao extends Thread {
 	private static double FOODMAGICNUMBER = 0.0255;
 	
 	public CalcularConsumoAlimentacao(Familia familia) {
+		super("Consumo Alimentação " + Thread.currentThread().getId());
 		this.familia = familia;
 	}
 	
@@ -21,11 +22,15 @@ public class CalcularConsumoAlimentacao extends Thread {
 			}
 			familia.getCidade().addConsumoAlimentacao(consumoAlimentacao);
 			try {
-				wait();
+				aguardar();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	private synchronized void aguardar() throws InterruptedException {
+		wait();
 	}
 
 }

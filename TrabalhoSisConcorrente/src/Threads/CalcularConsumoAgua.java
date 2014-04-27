@@ -8,6 +8,7 @@ public class CalcularConsumoAgua extends Thread {
 		private static int AGUAPORDIA = 2;
 		
 		public CalcularConsumoAgua(Familia familia) {
+			super("Consumo Agua " + Thread.currentThread().getId());
 			this.familia = familia;
 		}
 		
@@ -16,10 +17,14 @@ public class CalcularConsumoAgua extends Thread {
 			while (true) {
 				familia.getCidade().addConsumoAgua(familia.getIntegrantes().size() * AGUAPORDIA * 30);
 				try {
-					wait();
+					aguardar();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
 			}
-		}		
+		}	
+		
+		private synchronized void aguardar() throws InterruptedException {
+			wait();
+		}
 	}
