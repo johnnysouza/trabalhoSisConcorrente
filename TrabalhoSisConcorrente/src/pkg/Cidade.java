@@ -15,7 +15,7 @@ import Threads.ThreadCalculoConsumo;
 public class Cidade extends Thread {
 
 	public long intervalo;
-	public int quantAnos;
+	public int quantMeses;
 	private List<ThreadCalculoConsumo> threadsConsumo = new ArrayList<>();
 	private final List<Familia> familias = new ArrayList<>();
 	private long consumoAgua;
@@ -27,9 +27,9 @@ public class Cidade extends Thread {
 	private Lock lockThreads;
 	private int finalizedThreads = 0;
 	
-	public Cidade(int quantAnos, long intervalo) {
+	public Cidade(int quantMeses, long intervalo) {
 		super("Cidade");
-		this.quantAnos = quantAnos;
+		this.quantMeses = quantMeses;
 		this.intervalo = intervalo;
 		Familia[] loadFamilys = FamiliasManager.loadFamilys();
 		for (Familia familia : loadFamilys) {
@@ -51,11 +51,11 @@ public class Cidade extends Thread {
 	@Override
 	public void run() {
 		startThreads();
-		while (quantAnos > 0) {
+		while (quantMeses > 0) {
 			try {
 				startGrowing();
 				sleep(intervalo);
-				quantAnos--;
+				quantMeses--;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -72,14 +72,14 @@ public class Cidade extends Thread {
 
 	private void startThreads() {
 		for (Familia familia : familias) {
-			CalcularConsumoAgua agua = new CalcularConsumoAgua(familia, quantAnos);
+			CalcularConsumoAgua agua = new CalcularConsumoAgua(familia, quantMeses);
 			threadsConsumo.add(agua);
 			agua.start();
-			CalcularConsumoAlimentacao alimentacao = new CalcularConsumoAlimentacao(familia, quantAnos);
+			CalcularConsumoAlimentacao alimentacao = new CalcularConsumoAlimentacao(familia, quantMeses);
 			threadsConsumo.add(alimentacao);
 			alimentacao.start();
 			
-			CalcularConsumoLuz luz = new CalcularConsumoLuz(familia, quantAnos);
+			CalcularConsumoLuz luz = new CalcularConsumoLuz(familia, quantMeses);
 			threadsConsumo.add(luz);
 			luz.start();
 		}
