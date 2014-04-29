@@ -3,6 +3,7 @@ package pkg;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -14,6 +15,7 @@ import Threads.ThreadCalculoConsumo;
 
 public class Cidade extends Thread {
 
+	private static final Semaphore semaforo = new Semaphore(3, true);
 	public long intervalo;
 	public int quantMeses;
 	private List<ThreadCalculoConsumo> threadsConsumo = new ArrayList<>();
@@ -27,8 +29,9 @@ public class Cidade extends Thread {
 	private Lock lockThreads;
 	private int finalizedThreads = 0;
 	
-	public Cidade(int quantMeses, long intervalo) {
-		super("Cidade");
+
+	public Cidade(int quantMeses, long intervalo, int id) {
+		super("Cidade" + id);
 		this.quantMeses = quantMeses;
 		this.intervalo = intervalo;
 		Familia[] loadFamilys = FamiliasManager.loadFamilys();
@@ -43,33 +46,44 @@ public class Cidade extends Thread {
 		lockLuz = new ReentrantLock();
 		lockThreads = new ReentrantLock();
 	}
-
+	
 	public Cidade() {
-		this(10, 1000);
+		this(10, 1000, 1);
 	}
-
+	
 	@Override
 	public void run() {
 		startThreads();
-		while (quantMeses > 0) {
+		try {
+			semaforo.acquire();
 			try {
-				startGrowing();
-				sleep(intervalo);
-				quantMeses--;
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+				while (quantMeses > 0) {
+					while (finalizedThreads < (familias.size() * 3)) {
+						sleep(50);
+					}
+					showStatus();
+					consumoAgua = 0;
+					consumoAlimentacao = 0;
+					consumoLuz = 0;
+					finalizedThreads = 0;
+					addPopulacao();
+					notificarThreadsConsumo();
+					sleep(intervalo);
+					quantMeses--;
+				}
+			} finally {
+				semaforo.release();
 			}
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
-
-	private void startGrowing() throws InterruptedException {
-		while (finalizedThreads < (familias.size() * 3)) {
-			sleep(50);
-		}
-		finalizedThreads = 0;
-		addPopulacao();
+	
+	private void showStatus() {
+		System.out.println(String.valueOf(getTamanhoPopulacao()) + "\t\t" + consumoAgua + "\t\t" + consumoLuz + "\t\t"
+				+ consumoAlimentacao);
 	}
-
+	
 	private void startThreads() {
 		for (Familia familia : familias) {
 			CalcularConsumoAgua agua = new CalcularConsumoAgua(familia, quantMeses);
@@ -83,9 +97,10 @@ public class Cidade extends Thread {
 			threadsConsumo.add(luz);
 			luz.start();
 		}
+		System.out.println("Tamanho\t\tAgua\t\tLuz\t\tAlimento");
 	}
-
-	public void addConsumoAgua(long consumoAgua) {
+	
+	public void addConsumoAgua(final long consumoAgua) {
 		try {
 			lockAgua.lock();
 			this.consumoAgua += consumoAgua;
@@ -96,31 +111,31 @@ public class Cidade extends Thread {
 			lockThreads.unlock();
 		}
 	}
-
-	public void addConsumoAlimentacao(long consumoAlimentos) {
+	
+	public void addConsumoAlimentacao(final long consumoAlimentos) {
 		try {
 			lockAlimentacao.lock();
+			consumoAlimentacao += consumoAlimentos;
 			lockThreads.lock();
-			this.consumoAlimentacao += consumoAlimentos;
 			finalizedThreads++;
 		} finally {
 			lockAlimentacao.unlock();
 			lockThreads.unlock();
 		}
 	}
-
-	public void addConsumoLuz(long consumoLuz) {
+	
+	public void addConsumoLuz(final long consumoLuz) {
 		try {
 			lockLuz.lock();
-			lockThreads.lock();
 			this.consumoLuz += consumoLuz;
+			lockThreads.lock();
 			finalizedThreads++;
 		} finally {
 			lockLuz.unlock();
 			lockThreads.unlock();
 		}
 	}
-
+	
 	public synchronized void addPopulacao() {
 		int cresimentoPop = (int) (getTamanhoPopulacao() * 0.03);
 		if (cresimentoPop == 0) {
@@ -128,12 +143,9 @@ public class Cidade extends Thread {
 		}
 		Random familyRandom = new Random();
 		for (int i = 0; i < cresimentoPop; i++) {
-			Familia familia = familias
-					.get(familyRandom.nextInt(familias.size()));
+			Familia familia = familias.get(familyRandom.nextInt(familias.size()));
 			familia.addNovoIntegrante();
 		}
-		System.out.println("Tamanho da população: " + getTamanhoPopulacao());
-		notificarThreadsConsumo();
 	}
 	
 	private void notificarThreadsConsumo() {
@@ -141,7 +153,7 @@ public class Cidade extends Thread {
 			thread.notificar();
 		}
 	}
-
+	
 	private int getTamanhoPopulacao() {
 		int tamPopulacao = 0;
 		for (Familia familia : familias) {
@@ -149,9 +161,4 @@ public class Cidade extends Thread {
 		}
 		return tamPopulacao;
 	}
-
-	public static void main(final String[] args) {
-		new Cidade();
-	}
-
 }

@@ -2,12 +2,12 @@ package Threads;
 
 public class ThreadCalculoConsumo extends Thread {
 	
-	public ThreadCalculoConsumo(String nome) {
+	public ThreadCalculoConsumo(final String nome) {
 		super(nome);
 	}
 	
 	public synchronized void notificar() {
-		notifyAll();
+		notify();
 	}
-
+	
 }
