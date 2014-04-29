@@ -6,7 +6,7 @@ import pkg.Cidade;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		Scanner scan = new Scanner(System.in);
 		int quantCidades = 0;
 		try {
