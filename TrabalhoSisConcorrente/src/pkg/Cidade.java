@@ -3,6 +3,7 @@ package pkg;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -14,6 +15,7 @@ import Threads.ThreadCalculoConsumo;
 
 public class Cidade extends Thread {
 
+	private static final Semaphore semaforo = new Semaphore(3, true);
 	public long intervalo;
 	public int quantMeses;
 	private List<ThreadCalculoConsumo> threadsConsumo = new ArrayList<>();
@@ -27,8 +29,8 @@ public class Cidade extends Thread {
 	private Lock lockThreads;
 	private int finalizedThreads = 0;
 	
-	public Cidade(int quantMeses, long intervalo) {
-		super("Cidade");
+	public Cidade(int quantMeses, long intervalo, int id) {
+		super("Cidade" + id);
 		this.quantMeses = quantMeses;
 		this.intervalo = intervalo;
 		Familia[] loadFamilys = FamiliasManager.loadFamilys();
@@ -45,21 +47,24 @@ public class Cidade extends Thread {
 	}
 
 	public Cidade() {
-		this(10, 1000);
+		this(10, 1000, 1);
 	}
 
 	@Override
 	public void run() {
-		startThreads();
-		while (quantMeses > 0) {
-			try {
-				startGrowing();
-				sleep(intervalo);
-				quantMeses--;
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
+		try {
+            semaforo.acquire();
+            startThreads();
+            while (quantMeses > 0) {
+                startGrowing();
+                sleep(intervalo);
+                quantMeses--;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            semaforo.release();
+        }
 	}
 
 	private void startGrowing() throws InterruptedException {
@@ -132,7 +137,7 @@ public class Cidade extends Thread {
 					.get(familyRandom.nextInt(familias.size()));
 			familia.addNovoIntegrante();
 		}
-		System.out.println("Tamanho da população: " + getTamanhoPopulacao());
+		System.out.println("Tamanho da população na cidade " + this.getName() + ": " + getTamanhoPopulacao());
 		notificarThreadsConsumo();
 	}
 	
