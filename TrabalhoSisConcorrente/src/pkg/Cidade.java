@@ -14,8 +14,8 @@ import Threads.ThreadCalculoConsumo;
 
 public class Cidade extends Thread {
 
-	public static final int WAIT_TIME = 1000;
-	public static int QUANT_PERIODODOS = 5;
+	public long intervalo;
+	public int quantAnos;
 	private List<ThreadCalculoConsumo> threadsConsumo = new ArrayList<>();
 	private final List<Familia> familias = new ArrayList<>();
 	private long consumoAgua;
@@ -26,9 +26,11 @@ public class Cidade extends Thread {
 	private Lock lockLuz;
 	private Lock lockThreads;
 	private int finalizedThreads = 0;
-
-	public Cidade() {
+	
+	public Cidade(int quantAnos, long intervalo) {
 		super("Cidade");
+		this.quantAnos = quantAnos;
+		this.intervalo = intervalo;
 		Familia[] loadFamilys = FamiliasManager.loadFamilys();
 		for (Familia familia : loadFamilys) {
 			if (familia != null) {
@@ -42,14 +44,18 @@ public class Cidade extends Thread {
 		lockThreads = new ReentrantLock();
 	}
 
+	public Cidade() {
+		this(10, 1000);
+	}
+
 	@Override
 	public void run() {
 		startThreads();
-		while (QUANT_PERIODODOS > 0) {
+		while (quantAnos > 0) {
 			try {
 				startGrowing();
-				sleep(WAIT_TIME);
-				QUANT_PERIODODOS--;
+				sleep(intervalo);
+				quantAnos--;
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -66,14 +72,14 @@ public class Cidade extends Thread {
 
 	private void startThreads() {
 		for (Familia familia : familias) {
-			CalcularConsumoAgua agua = new CalcularConsumoAgua(familia, QUANT_PERIODODOS);
+			CalcularConsumoAgua agua = new CalcularConsumoAgua(familia, quantAnos);
 			threadsConsumo.add(agua);
 			agua.start();
-			CalcularConsumoAlimentacao alimentacao = new CalcularConsumoAlimentacao(familia, QUANT_PERIODODOS);
+			CalcularConsumoAlimentacao alimentacao = new CalcularConsumoAlimentacao(familia, quantAnos);
 			threadsConsumo.add(alimentacao);
 			alimentacao.start();
 			
-			CalcularConsumoLuz luz = new CalcularConsumoLuz(familia, QUANT_PERIODODOS);
+			CalcularConsumoLuz luz = new CalcularConsumoLuz(familia, quantAnos);
 			threadsConsumo.add(luz);
 			luz.start();
 		}
