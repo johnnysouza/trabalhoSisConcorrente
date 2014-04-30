@@ -46,4 +46,12 @@ public class Familia implements Serializable {
 	public List<Pessoa> getIntegrantes() {
 		return integrantes;
 	}
+
+	public boolean matarPessoa() {
+		if(integrantes.size() == 0){
+			return false;
+		}
+		integrantes.remove(0);
+		return true;
+	}
 }
