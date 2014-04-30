@@ -3,6 +3,7 @@ package pkg;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Familia implements Serializable {
 	
@@ -19,19 +20,30 @@ public class Familia implements Serializable {
 	}
 
 	public void addNovoIntegrante() {
+		int mediaEscolaridade = 0;
+		double mediaRenda = 0;
+		double mediaPeso = 0;
 		int tamFamilia = integrantes.size();
-		int totalEscolaridade = 0;
-		double totalRenda = 0;
-		double totalPeso = 0;
-		for (int i = 0; i < tamFamilia; i++) {
-			Pessoa pessoa = integrantes.get(i);
-			totalEscolaridade += pessoa.getEscolaridade().ordinal();
-			totalRenda += pessoa.getRenda();
-			totalPeso += pessoa.getPeso();
+		if (tamFamilia != 0) {
+			int totalEscolaridade = 0;
+			double totalRenda = 0;
+			double totalPeso = 0;
+			for (int i = 0; i < tamFamilia; i++) {
+				Pessoa pessoa = integrantes.get(i);
+				totalEscolaridade += pessoa.getEscolaridade().ordinal();
+				totalRenda += pessoa.getRenda();
+				totalPeso += pessoa.getPeso();
+			}
+			mediaEscolaridade = totalEscolaridade / tamFamilia;
+			mediaRenda = totalRenda / tamFamilia;
+			mediaPeso = totalPeso / tamFamilia;
+			integrantes.add(new Pessoa(Escolaridade.values()[mediaEscolaridade], mediaRenda, mediaPeso));
+		} else {
+			Random random = new Random();
+			mediaEscolaridade = random.nextInt(5);
+			mediaRenda = random.nextDouble() * 200;
+			mediaPeso = random.nextFloat() * 20000;
 		}
-		int mediaEscolaridade = totalEscolaridade / tamFamilia;
-		double mediaRenda = totalRenda / tamFamilia;
-		double mediaPeso = totalPeso / tamFamilia;
 		integrantes.add(new Pessoa(Escolaridade.values()[mediaEscolaridade], mediaRenda, mediaPeso));
 	}
 	

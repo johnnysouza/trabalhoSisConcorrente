@@ -16,6 +16,8 @@ import Threads.ThreadCalculoConsumo;
 
 public class Cidade extends Thread {
 
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+	private StringBuilder estastistica = new StringBuilder();
 	private static final int LIMIAR_MORTE = 10000;
 	private Mortalidade morte;
 	private Lock lockMorte;
@@ -55,6 +57,9 @@ public class Cidade extends Thread {
 		condicaoMorte = morte.getCondicaoMorte();
 		lockMorte = morte.getLock();
 		morte.start();
+		
+		estastistica.append(this.getName());
+		estastistica.append(LINE_SEPARATOR);
 	}
 
 	public Cidade() {
@@ -81,7 +86,7 @@ public class Cidade extends Thread {
 				finalizedThreads = 0;
 				addPopulacao();
 				countToKill--;
-				if (countToKill < 1 && getTamanhoPopulacao() < LIMIAR_MORTE) { //TODO inverter '<'
+				if (countToKill < 1 && getTamanhoPopulacao() > LIMIAR_MORTE) {
 					lockMorte.lock();
 					condicaoMorte.signal();
 					countToKill = random.nextInt(8) + 4;
@@ -91,20 +96,30 @@ public class Cidade extends Thread {
 				sleep(intervalo);
 				quantMeses--;
 			}
-		} catch (InterruptedException e) {
+		} catch (Throwable e) {
 			e.printStackTrace();
 		} finally {
+			try {
 			lockMorte.lock();
 			condicaoMorte.signalAll();
 			lockMorte.unlock();
 			semaforo.release();
-		}
+			} catch (Throwable ex) {
+				ex.printStackTrace();
+			}
+ 		}
+		System.out.println(estastistica.toString());
 	}
 
 	private void showStatus() {
-		System.out.println(String.valueOf(getTamanhoPopulacao()) + "\t\t"
-				+ consumoAgua + "\t\t" + consumoLuz + "\t\t"
-				+ consumoAlimentacao);
+		estastistica.append(getTamanhoPopulacao());
+		estastistica.append("\t\t");
+		estastistica.append(consumoAgua);
+		estastistica.append("\t\t");
+		estastistica.append(consumoLuz);
+		estastistica.append("\t\t");
+		estastistica.append(consumoAlimentacao);
+		estastistica.append(LINE_SEPARATOR);
 	}
 
 	private void startThreads() {
@@ -122,7 +137,14 @@ public class Cidade extends Thread {
 			threadsConsumo.add(luz);
 			luz.start();
 		}
-		System.out.println("Tamanho\t\tAgua\t\tLuz\t\tAlimento");
+		estastistica.append("Tamanho");
+		estastistica.append("\t\t");
+		estastistica.append("Agua");
+		estastistica.append("\t\t");
+		estastistica.append("Luz");
+		estastistica.append("\t\t");
+		estastistica.append("Alimento");
+		estastistica.append(LINE_SEPARATOR);
 	}
 
 	public void addConsumoAgua(final long consumoAgua) {

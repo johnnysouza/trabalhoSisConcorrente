@@ -23,11 +23,9 @@ public class Mortalidade extends Thread {
 		try {
 			lock.lock();
 			condicaoMorte.await();
-			while (cidade.isAlive()) {
-				if (cidade.isAlive() && cidade.getQuantMeses() > 0) {
-					executarPessoas();
-					condicaoMorte.await();
-				}
+			while (cidade.isAlive() && cidade.getQuantMeses() > 0) {
+				executarPessoas();
+				condicaoMorte.await();
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -57,7 +55,7 @@ public class Mortalidade extends Thread {
 	public Condition getCondicaoMorte() {
 		return condicaoMorte;
 	}
-	
+
 	public Lock getLock() {
 		return lock;
 	}

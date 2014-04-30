@@ -9,7 +9,7 @@ import pkg.Pessoa;
 public class BaseDados {
 	
 	public static void main(final String[] args) {
-		int TotalPeople = 100;
+		int TotalPeople = 10000;
 		Pessoa[] listaPessoas = new Pessoa[TotalPeople];
 		Random random = new Random();
 		for (int i = 0; i < TotalPeople; i++) {
