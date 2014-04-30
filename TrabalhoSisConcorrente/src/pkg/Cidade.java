@@ -12,6 +12,7 @@ import BaseDados.FamiliasManager;
 import Threads.CalcularConsumoAgua;
 import Threads.CalcularConsumoAlimentacao;
 import Threads.CalcularConsumoLuz;
+import Threads.Mortalidade;
 import Threads.ThreadCalculoConsumo;
 
 public class Cidade extends Thread {
